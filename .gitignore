@@ -1,0 +1,6 @@
+dist
+elsample_*
+log
+*.db
+.config
+test_*

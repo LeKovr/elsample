@@ -1,0 +1,39 @@
+# -------------------------------------------------------------------------------
+# web app fidm config
+# https://github.com/LeKovr/fidm
+
+image: consup_nginx
+project: app
+
+# -------------------------------------------------------------------------------
+# Image exchange info
+# -------------------------------------------------------------------------------
+
+# yml def names for required images
+requires:
+- consup/nginx mode=common
+
+# yml def names for linked containers with autostart
+links:
+- consup/consul    # consul.yml
+
+# -------------------------------------------------------------------------------
+
+private:
+- 80
+
+env:
+- LOCALE=ru_RU
+- SERVICE=web
+
+# use local consul as DNS
+dns: 127.0.0.1
+
+# Daemon
+detach: true
+
+# Interactive
+#interactive: true
+#tty: true
+#rm: true
+
