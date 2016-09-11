@@ -35,7 +35,7 @@ import (
 	"github.com/LeKovr/elsa/mw/sample"
 	"github.com/LeKovr/elsa/mw/stats"
 
-	"it.elfire.ru/elfire/elsample2/api"
+	"github.com/LeKovr/elsample/api"
 )
 
 // -----------------------------------------------------------------------------
@@ -171,6 +171,7 @@ func setUp(cfg *Config) (lg *log.Logger, err error) {
 
 // -----------------------------------------------------------------------------
 
+// Use calls negroni.Use for a slice of handlers
 func Use(n *negroni.Negroni, handlers ...negroni.Handler) {
 	for _, h := range handlers {
 		n.Use(h)
@@ -178,7 +179,8 @@ func Use(n *negroni.Negroni, handlers ...negroni.Handler) {
 }
 
 // -----------------------------------------------------------------------------
-// UseIfAllowed calls midleware only if flow prohibited flag is not set
+
+// UseIfAllowed calls midleware only if flow's prohibited flag is not set
 func UseIfAllowed(n *negroni.Negroni, lg *log.Logger, handlers ...negroni.Handler) {
 	for _, h := range handlers {
 		n.Use(flow.NewHandler(lg, h))
