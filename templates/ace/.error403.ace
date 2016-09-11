@@ -1,0 +1,56 @@
+= content main
+  .container
+    div class="card card-container"
+      img#profile-img class="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+        p#profile-name class="profile-name-card" Авторизация
+        form.form-signin onSubmit="return sendLogin(this)"
+          #log class="form-status"
+          .input-group
+            span class="input-group-addon"
+              i class="glyphicon glyphicon-user"
+            input#login type="text" class="form-control" name="login" placeholder="Логин" required="" autofocus=""
+          .input-group
+            span class="input-group-addon"
+              i class="glyphicon glyphicon-lock"
+            input#password type="password" class="form-control" name="password" placeholder="Пароль" required=""
+          .checkbox
+            label
+              input#remember type="checkbox" name="remember"
+              | Запомнить меня
+          button class="btn btn-primary btn-block btn-signin" type="submit"
+            | Войти
+        a href="#" class="forgot-password" onClick="return showHelp()" Забыли пароль?
+
+  script src="/vendor/js/jquery-1.12.1.min.js" type="text/javascript"
+  script src="/vendor/js/jquery.cookie.js"     type="text/javascript"
+  script src="/vendor/js/jquery.jsonrpc.js"    type="text/javascript"
+  script src="/js/jquery.rpcapi.js"     type="text/javascript"
+  = javascript
+    function sendLogin(form) {
+      $('#log').html('Авторизация...').removeClass('alert-danger').addClass('alert-info');
+      $.rpc.api({
+        Form:      form,
+        nameSpace: 'Service',
+        Method:    'Login',
+        onSuccess: function(result) {
+          $('#log').html('Успех')
+          var attr = { path: '/' }
+          if ($("#remember").prop("checked")) attr.expires = 14;
+          $.cookie('elfire_sso_token', result.JWT, attr);
+          location.reload(true);
+        },
+        onError:   function(error) {
+          $('#log').html('Ошибка: ' + error.message).removeClass('alert-info').addClass('alert-danger');
+        }
+      });
+      return false;
+    }
+
+    function showHelp() {
+      $('#log').html('Для восстановления пароля обратитесь к администратору').removeClass('alert-danger').addClass('alert-info');
+    }
+
+    $(document).ready(function(){
+      $.rpc.setup({endPoint:'/api/v1'});
+      $.cookie.json = false;
+    });

@@ -1,0 +1,9 @@
+= content main
+  div
+    ||
+      == {{ .Body }} ==
+      a line more
+
+= content sub
+  hr
+  div Created: {{ .Created }}

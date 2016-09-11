@@ -1,21 +1,22 @@
 ##
 ## Golang application makefile
 ##
+SHELL      = /bin/bash
 
 # application name
 PRG       ?= $(shell basename $$PWD)
-SOURCES   ?= *.go */*.go
-SOURCEDIR ?= ". app"
+SOURCES   ?= *.go api/*.go
+SOURCEDIR ?= ". api"
 
 # Default config
-SHELL      = /bin/bash
 OS        ?= linux
 ARCH      ?= amd64
 DIRDIST   ?= dist
 PRGBIN    ?= $(PRG)_$(OS)_$(ARCH)
 PRGPATH   ?= $(PRGBIN)
 STAMP     ?= $$(date +%Y-%m-%d_%H:%M.%S)
-ALLARCH   ?= "linux/amd64 linux/386 windows/amd64 darwin/386"
+ALLARCH   ?= "linux/amd64 linux/386  darwin/386"
+# windows/amd64
 
 # Search .git for commit id fetch
 GIT_ROOT  ?= $$([ -d ./.git ] && echo "." || { [ -d ../.git ] && echo ".." ; } || { [ -d ../../.git ] && echo "../.." ; })
@@ -32,17 +33,17 @@ DB_NAME  ?= appdb.db
 ## Available targets are:
 ##
 
-# default: show target list
+## default: show target list
 all:
 	@grep -A 1 "^##" Makefile
 
-## build and run
-run: build
-	./$(PRGPATH) --log_level debug
+## compile and run
+run:
+	go run -v *.go --log_level debug --db_debug
 
 ## build and show help
-help: build
-	./$(PRGPATH) --help
+help:
+	go run *.go -h
 
 ## build and show version
 ver: build

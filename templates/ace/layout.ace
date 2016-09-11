@@ -1,0 +1,23 @@
+= doctype html
+html lang=en
+  head
+    meta charset=utf-8
+    title {{ .Title }}
+    link rel="stylesheet" href="/vendor/css/bootstrap.min.css"
+    link rel="stylesheet" href="/css/main.css"
+     = yield head .
+    = css
+      h1 { color: blue; }
+  body
+    h1 {{ .Title }}
+    #container.wrapper
+      = yield main .
+      = include menu .
+      = yield sub .
+    hr
+    p.warn The End {{ " | " }}
+      a href=/page-render Render
+      {{ " | " }}
+      a href=/stats Stats
+    = javascript
+//      alert('hi');

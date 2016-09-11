@@ -1,0 +1,12 @@
+= content main
+  div.container
+    div style="margin-top: 10%; margin-bottom: 30%; padding:5px"
+      div class="well col-md-6 col-md-offset-3"
+        h4 404. Not Found
+        p We are sorry but we have no page for this address.
+        p К сожалению, у нас нет страницы с таким адресом.
+
+= content sub
+  hr
+  div &copy; 2016, 
+    a href=mailto:support@elfire.ru?subject=a.elfire.ru ELFIRE.RU

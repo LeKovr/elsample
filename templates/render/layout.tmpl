@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="en">
+  <head>
+    <title>{{ .Title }}</title>
+    <!-- Render the partial template called `css-$current_template` here -->
+    {{ partial "css" }}
+    <style>
+      h1 { color: blue; }
+    </style>
+  </head>
+  <body>
+    <h1>{{ .Title }}</h1>
+    <div id="container" class="wrapper">
+      <!-- Render the current template here -->
+      {{ yield }}
+      <!-- render the partial template called `footer-$current_template` here -->
+    </div>
+    <hr>Menu1 | Menu 2
+    {{ partial "footer" }}
+    <hr>
+    <p class="warn">The End | 
+      <a href="/page-ace">Ace</a> |
+      <a href="/stats">Stats</a>
+    </p>
+  </body>
+</html>

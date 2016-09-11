@@ -1,0 +1,10 @@
+= content main
+  div
+    ||
+      This is an index page
+      == {{ .Body }} ==
+      a line more
+
+= content sub
+  hr
+  div Created: {{ .Created }}

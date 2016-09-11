@@ -67,3 +67,5 @@ input.form-control1,
 @-moz-document url-prefix() {
   fieldset { display: table-cell; }
 }
+
+.demo-warn { background-color: green; }

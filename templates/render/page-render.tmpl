@@ -1,0 +1,11 @@
+== {{ .Body }} ==<br/>
+a line more
+
+{{ define "css-page-render" }}
+<link rel="stylesheet" href="/main.css">
+{{ end }}
+
+{{ define "footer-page-render"}}
+<hr>
+<div>Created: {{ .Created }}</div>
+{{ end }}

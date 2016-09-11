@@ -1,15 +1,13 @@
-package app
+package api
 
 import (
 	"fmt"
-	json "github.com/gorilla/rpc/v2/json2"
+	rpc "github.com/gorilla/rpc/v2/json2"
+	"log"
 	"net/http"
 	"time"
 
-	auth "github.com/LeKovr/elsa-auth/psw"
-
 	"github.com/LeKovr/go-base/database"
-	"github.com/LeKovr/go-base/logger"
 )
 
 // -----------------------------------------------------------------------------
@@ -33,32 +31,26 @@ type Records []Record
 
 // -----------------------------------------------------------------------------
 
-// App - Класс сервера API
-type App struct {
-	DB   *database.DB
-	Log  *logger.Log
-	Auth *auth.App
+type Service struct {
+	Log     *log.Logger
+	DB      *database.DB
+	Field   string // Context field for Sessiondata
+	IPField string // `long:"logger_realip_field" default:"real-ip" description:"Context field for Real ip"`
 }
 
 // -----------------------------------------------------------------------------
 
 // New - Конструктор сервера API
-func New(db *database.DB, log *logger.Log, auth *auth.App) *App {
-
-	a := App{Log: log.WithField("in", "app"), DB: db, Auth: auth}
-	a.initDB()
-	return &a
+func New(logger *log.Logger, db *database.DB) *Service {
+	srv := Service{Log: logger, DB: db}
+	srv.initDB()
+	return &srv
 }
 
 // -----------------------------------------------------------------------------
 
 // List - выборка строк из журнала
-func (a *App) List(r *http.Request, args *ListArgs, reply *Records) error {
-	_, err := a.Auth.ParseJWT(r)
-	if err != nil {
-		a.Log.Errorf("JWT parse error: %+v", err)
-		return &json.Error{Code: -32011, Message: "Auth required"}
-	}
+func (srv *Service) List(r *http.Request, args *ListArgs, result *Records) error {
 
 	// debug.Log.Printf("Called Records: %+v", args)
 
@@ -66,39 +58,41 @@ func (a *App) List(r *http.Request, args *ListArgs, reply *Records) error {
 		args.Before = time.Now()
 	}
 
+	srv.Log.Printf("debug: called list(%+v)", args)
+
 	var recs Records
-	err = a.DB.Engine.
-		Where("phone like ?", args.Phone+"%").
-		And("ip like ?", args.IP+"%").
+	err := srv.DB.Engine.
+		Where("phone like ?", "%"+args.Phone+"%").
+		And("ip like ?", "%"+args.IP+"%").
 		And("stamp > ?", args.After).
 		And("stamp <= ?", args.Before).
 		Limit(args.By, args.Offset).
 		Asc("stamp", "ip").
 		Find(&recs)
 	if err != nil {
-		a.Log.Errorf("Fetch records error: %+v", err)
-		return &json.Error{Code: -32012, Message: "Fetch error"}
+		srv.Log.Printf("error: Fetch records error: %+v", err)
+		return &rpc.Error{Code: -32012, Message: "Fetch error"}
 	}
 
-	*reply = recs
+	*result = recs
 	return nil
 }
 
 // -----------------------------------------------------------------------------
 
 // initDB prepares database
-func (a *App) initDB() {
+func (srv *Service) initDB() {
 
-	engine := a.DB.Engine
+	engine := srv.DB.Engine
 
 	err := engine.Sync(new(Record))
 	if err != nil {
-		a.Log.Fatalf("DB sync error: %v", err)
+		srv.Log.Printf("fatal: DB sync error: %v", err)
 	}
 
 	isempty, err := engine.IsTableEmpty("record")
 	if err != nil {
-		a.Log.Fatalf("DB checkempty error: %v", err)
+		srv.Log.Printf("fatal: DB checkempty error: %v", err)
 	}
 
 	if isempty {
@@ -106,7 +100,7 @@ func (a *App) initDB() {
 		for i := 1; i < 255; i++ {
 			r := Record{Phone: "89181234567", IP: fmt.Sprintf("127.0.0.%d", i), Status: "SUCCESS", Stamp: time.Now().Add(time.Duration(-1*i) * time.Minute)}
 			if _, err := engine.Insert(&r); err != nil {
-				a.Log.Debugf("Record add error: %+v", err)
+				srv.Log.Printf("debug: Record add error: %+v", err)
 			}
 		}
 	}
